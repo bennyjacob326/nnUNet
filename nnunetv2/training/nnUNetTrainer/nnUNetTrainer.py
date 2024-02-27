@@ -1086,7 +1086,8 @@ class nnUNetTrainer(object):
                 torch.save(checkpoint, filename)
                 try:
                     files.download(filename)
-                except: 
+                except Exception as e:
+                    self.print_to_log_file(e)
                     self.print_to_log_file('Running locally, no local checkpoint need be downloaded')
             else:
                 self.print_to_log_file('No checkpoint written, checkpointing is disabled')
@@ -1098,7 +1099,8 @@ class nnUNetTrainer(object):
         if isinstance(filename_or_checkpoint, str):
             try:
                 filename_or_checkpoint = files.upload()
-            except:
+            except Exception as e:
+                self.print_to_log_file(e)
                 self.print_to_log_file('Running locally, no local checkpoint need be uploaded')
             checkpoint = torch.load(filename_or_checkpoint, map_location=self.device)
         # if state dict comes from nn.DataParallel but we use non-parallel model here then the state dict keys do not
