@@ -65,7 +65,7 @@ from torch.cuda import device_count
 from torch.cuda.amp import GradScaler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-from google.colab import files #for downloading/uploading to/from colab 
+# from google.colab import files #for downloading/uploading to/from colab 
 
 class nnUNetTrainer(object):
     def __init__(self, plans: dict, configuration: str, fold: int, dataset_json: dict, unpack_dataset: bool = True,
@@ -183,7 +183,7 @@ class nnUNetTrainer(object):
         # self.configure_rotation_dummyDA_mirroring_and_inital_patch_size and will be saved in checkpoints
 
         ### checkpoint saving stuff
-        self.save_every = 50
+        self.save_every = 5
         self.disable_checkpointing = False
 
         ## DDP batch size and oversampling can differ between workers and needs adaptation
@@ -1084,10 +1084,6 @@ class nnUNetTrainer(object):
                     'inference_allowed_mirroring_axes': self.inference_allowed_mirroring_axes,
                 }
                 torch.save(checkpoint, filename)
-                try:
-                    files.download(filename)
-                except: 
-                    self.print_to_log_file('Running locally, no local checkpoint need be downloaded')
             else:
                 self.print_to_log_file('No checkpoint written, checkpointing is disabled')
 
@@ -1096,10 +1092,6 @@ class nnUNetTrainer(object):
             self.initialize()
 
         if isinstance(filename_or_checkpoint, str):
-            try:
-                filename_or_checkpoint = files.upload()
-            except:
-                self.print_to_log_file('Running locally, no local checkpoint need be uploaded')
             checkpoint = torch.load(filename_or_checkpoint, map_location=self.device)
         # if state dict comes from nn.DataParallel but we use non-parallel model here then the state dict keys do not
         # match. Use heuristic to make it match
