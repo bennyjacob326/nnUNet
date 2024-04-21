@@ -96,3 +96,21 @@ class RGBTo01Normalization(ImageNormalization):
         image /= 255.
         return image
 
+class MinMaxNormalization(ImageNormalization):
+    leaves_pixels_outside_mask_at_zero_if_use_mask_for_norm_is_true = False
+
+    def run(self, image: np.ndarray, seg: np.ndarray = None) -> np.ndarray:
+        image = image.astype(self.target_dtype, copy=False)
+        image_min = image.min()
+        image_max = image.max()
+
+        if self.use_mask_for_norm is not None and self.use_mask_for_norm:
+            mask = seg >= 0
+            image_min = image[mask].min()
+            image_max = image[mask].max()
+            image[mask] = (image[mask] - image_min) / (image_max - image_min)
+        else:
+            image = (image - image_min) / (image_max - image_min)
+
+        return image
+
