@@ -21,5 +21,5 @@ def get_normalization_scheme(channel_name: str) -> Type[ImageNormalization]:
     norm_scheme = channel_name_to_normalization_mapping.get(channel_name)
     if norm_scheme is None:
         norm_scheme = ZScoreNormalization
-    # print('Using %s for image normalization' % norm_scheme.__name__)
+    print('Using %s for image normalization' % norm_scheme.__name__)
     return norm_scheme
