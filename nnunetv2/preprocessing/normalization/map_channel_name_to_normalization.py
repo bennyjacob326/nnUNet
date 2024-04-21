@@ -8,7 +8,8 @@ channel_name_to_normalization_mapping = {
     'noNorm': NoNormalization,
     'zscore': ZScoreNormalization,
     'rescale_to_0_1': RescaleTo01Normalization,
-    'rgb_to_0_1': RGBTo01Normalization
+    'rgb_to_0_1': RGBTo01Normalization,
+    'minMax' : MinMaxNormalization
 }
 
 
