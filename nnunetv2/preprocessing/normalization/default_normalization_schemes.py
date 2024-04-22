@@ -114,3 +114,40 @@ class MinMaxNormalization(ImageNormalization):
 
         return image
 
+import numpy as np
+
+class HistogramEqualizationNormalization(ImageNormalization):
+    leaves_pixels_outside_mask_at_zero_if_use_mask_for_norm_is_true = False
+
+    def run(self, image: np.ndarray, seg: np.ndarray = None) -> np.ndarray:
+        image = image.astype(self.target_dtype, copy=False)
+
+        if self.use_mask_for_norm is not None and self.use_mask_for_norm:
+            mask = seg >= 0
+            image[~mask] = 0  # Set pixels outside the mask to 0
+            image = self.histogram_equalization(image, mask)
+        else:
+            image = self.histogram_equalization(image)
+
+        return image
+
+    def histogram_equalization(self, image, mask=None):
+        if mask is None:
+            mask = np.ones_like(image, dtype=bool)
+
+        # Get the histogram of the masked image
+        hist, bins = np.histogram(image[mask], bins=np.linspace(image[mask].min(), image[mask].max(), 256))
+
+        # Calculate the cumulative distribution function
+        cdf = hist.cumsum()
+        cdf = cdf / float(cdf[-1])
+
+        # Perform histogram equalization using the cdf
+        equalized = np.interp(image.ravel(), bins[:-1], cdf)
+        equalized = equalized.reshape(image.shape)
+
+        # Scale the equalized image to the range [0, 1]
+        equalized = (equalized - equalized.min()) / (equalized.max() - equalized.min())
+
+        return equalized
+
