@@ -39,7 +39,7 @@ class CustomResidualDenseUNetTrainer(nnUNetTrainer):
                                    enable_deep_supervision=True):
         num_stages = len(configuration_manager.conv_kernel_sizes)
         dim = len(configuration_manager.conv_kernel_sizes[0])
-        conv_op = CustomResidualDenseUNetTrainer.convert_dim_to_conv_op(dim)
+        conv_op = CustomResidualDenseUNet.convert_dim_to_conv_op(dim)
 
         label_manager = plans_manager.get_label_manager(dataset_json)
 
