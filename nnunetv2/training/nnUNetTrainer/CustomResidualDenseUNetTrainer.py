@@ -5,11 +5,32 @@ import torch
 from torch import nn
 from dynamic_network_architectures.building_blocks.residual_encoders import ResidualEncoder
 from dynamic_network_architectures.building_blocks.residual import BasicBlockD, BottleneckD
-from dynamic_network_architectures.building_blocks.dense_block import DenseBlock
-from nnunetv2.training.network_training.nnUNetTrainer import nnUNetTrainer
+
+class DenseLayer(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size=3):
+        super(DenseLayer, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, padding=1)
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        return self.relu(self.conv(x))
+
+class DenseBlock(nn.Module):
+    def __init__(self, num_layers, in_channels, growth_rate):
+        super(DenseBlock, self).__init__()
+        self.layers = nn.ModuleList([
+            DenseLayer(in_channels + i * growth_rate, growth_rate)
+            for i in range(num_layers)
+        ])
+
+    def forward(self, x):
+        outputs = [x]
+        for layer in self.layers:
+            outputs.append(layer(torch.cat(outputs, 1)))
+        return torch.cat(outputs, 1)
 
 
-class CustomResidualDenseUNetTrainer(nnUNetTrainer):
+class CustomResidualDenseUNetTrainer(nn.Module):
     @staticmethod
     def build_network_architecture(plans_manager, dataset_json, configuration_manager, num_input_channels,
                                    enable_deep_supervision=True):
@@ -63,10 +84,7 @@ class CustomResidualDenseUNet(nn.Module):
         self.dense_blocks = nn.ModuleList([
             DenseBlock(num_layers=3,  # Number of layers in each dense block
                        in_channels=features_per_stage[i],
-                       out_channels=features_per_stage[i],
-                       conv_op=conv_op,
-                       kernel_size=3,  # Kernel size of each convolution layer in the dense block
-                       **kwargs)
+                       growth_rate=32)
             for i in range(len(features_per_stage))
         ])
 
