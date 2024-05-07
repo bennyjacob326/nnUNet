@@ -6,7 +6,7 @@ from torch import nn
 from dynamic_network_architectures.building_blocks.residual_encoders import ResidualEncoder
 from dynamic_network_architectures.building_blocks.residual import BasicBlockD, BottleneckD
 
-from nnUNetTrainer import nnUNetTrainer
+from .nnUNetTrainer import nnUNetTrainer
 
 
 class DenseLayer(nn.Module):
