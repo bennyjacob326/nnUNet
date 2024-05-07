@@ -6,6 +6,8 @@ from torch import nn
 from dynamic_network_architectures.building_blocks.residual_encoders import ResidualEncoder
 from dynamic_network_architectures.building_blocks.residual import BasicBlockD, BottleneckD
 
+from nnunetv2.training import nnUNetTrainer
+
 class DenseLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3):
         super(DenseLayer, self).__init__()
