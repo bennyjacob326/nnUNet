@@ -30,7 +30,7 @@ class DenseBlock(nn.Module):
         return torch.cat(outputs, 1)
 
 
-class CustomResidualDenseUNetTrainer(nn.Module):
+class CustomResidualDenseUNetTrainer(nnUNetTrainer):
     @staticmethod
     def build_network_architecture(plans_manager, dataset_json, configuration_manager, num_input_channels,
                                    enable_deep_supervision=True):
