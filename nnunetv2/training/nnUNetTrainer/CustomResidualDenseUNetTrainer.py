@@ -1,6 +1,3 @@
-#In this implementation, each residual block is followed by a dense block, 
-#and the output of the dense block is concatenated with the 
-#input of the subsequent block
 import torch
 from torch import nn
 from dynamic_network_architectures.building_blocks.residual_encoders import ResidualEncoder
@@ -54,7 +51,8 @@ class CustomResidualDenseUNetTrainer(nnUNetTrainer):
                                          strides=configuration_manager.pool_op_kernel_sizes,
                                          num_classes=label_manager.num_segmentation_heads,
                                          deep_supervision=enable_deep_supervision,
-                                         configuration=configuration_manager.configuration,
+                                         block=configuration_manager.block,
+                                         dense_blocks_per_stage=configuration_manager.dense_blocks_per_stage,
                                          **configuration_manager.__dict__)
 
         return model
@@ -86,7 +84,7 @@ class CustomResidualDenseUNet(nn.Module):
 
         # Add dense blocks
         self.dense_blocks = nn.ModuleList([
-            DenseBlock(num_layers=3,  # Number of layers in each dense block
+            DenseBlock(num_layers=dense_blocks_per_stage,  # Number of layers in each dense block
                        in_channels=features_per_stage[i],
                        growth_rate=32)
             for i in range(len(features_per_stage))
